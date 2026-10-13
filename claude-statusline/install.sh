@@ -3,7 +3,8 @@ set -e
 
 CLAUDE_DIR="$HOME/.claude"
 SCRIPT_NAME="statusline-command.sh"
-REPO_RAW="https://raw.githubusercontent.com/merlintchoffo/claude-setup/main"
+REPO_RAW="https://raw.githubusercontent.com/merlintchoffo/claude-setup/main/claude-statusline"
+
 
 echo "→ Installing claude-statusline..."
 
