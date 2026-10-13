@@ -2,7 +2,8 @@
 # Claude Code status line: folder, git branch, model, context percentage with progress bar
 input=$(cat)
 
-# Parse JSON with python3 (jq isn't installed). Fields are tab-separated.
+# Parse JSON with python3 (jq isn't installed). Fields are 0x1f-separated
+# (non-whitespace) so empty fields are preserved by read.
 parsed=$(printf '%s' "$input" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
@@ -11,16 +12,20 @@ m = d.get("model") or {}
 model = m.get("display_name") or m.get("id") or "Claude"
 cw = d.get("context_window") or {}
 pct = cw.get("used_percentage")
+if pct is None:  # fresh/idle session: derive from tokens, else 0 so ctx always shows
+    size = cw.get("context_window_size") or 0
+    used = (cw.get("total_input_tokens") or 0) + (cw.get("total_output_tokens") or 0)
+    pct = used * 100 / size if size else 0
 effort_obj = d.get("effort") or {}
 effort = effort_obj.get("level") or ""
 rl = d.get("rate_limits") or {}
 five_h = (rl.get("five_hour") or {}).get("used_percentage")
 five_h_reset = (rl.get("five_hour") or {}).get("resets_at")
 seven_d = (rl.get("seven_day") or {}).get("used_percentage")
-sys.stdout.write("\t".join([cwd, model, "" if pct is None else str(pct), effort, "" if five_h is None else str(five_h), "" if five_h_reset is None else str(int(five_h_reset)), "" if seven_d is None else str(seven_d)]))
+sys.stdout.write("\x1f".join([cwd, model, str(round(pct)), effort, "" if five_h is None else str(round(five_h)), "" if five_h_reset is None else str(int(five_h_reset)), "" if seven_d is None else str(round(seven_d))]))
 ')
 
-IFS=$'\t' read -r cwd model used_pct effort five_h_pct five_h_reset seven_d_pct <<< "$parsed"
+IFS=$'\x1f' read -r cwd model used_pct effort five_h_pct five_h_reset seven_d_pct <<< "$parsed"
 
 folder=$(basename "$cwd")
 
@@ -52,7 +57,7 @@ if [ -n "$model" ]; then
   fi
 fi
 if [ -n "$used_pct" ]; then
-  pct_int=$(printf "%.0f" "$used_pct")
+  pct_int=$used_pct
   bar=$(build_bar "$pct_int")
   if [ "$pct_int" -gt 70 ]; then
     ctx_color='\033[31m'
@@ -67,7 +72,7 @@ if [ -n "$used_pct" ]; then
   parts+=("${ctx_color}ctx [${bar}] ${pct_int}%${ctx_reset}")
 fi
 if [ -n "$five_h_pct" ]; then
-  five_int=$(printf "%.0f" "$five_h_pct")
+  five_int=$five_h_pct
   bar=$(build_bar "$five_int")
   if   [ "$five_int" -le 40 ]; then color='\033[38;2;76;175;80m'
   elif [ "$five_int" -le 70 ]; then color='\033[33m'
@@ -91,7 +96,7 @@ if [ -n "$five_h_pct" ]; then
   parts+=("· 5h ${color}[${bar}] ${five_int}%${reset}${countdown}")
 fi
 if [ -n "$seven_d_pct" ]; then
-  seven_int=$(printf "%.0f" "$seven_d_pct")
+  seven_int=$seven_d_pct
   if [ "$seven_int" -ge 30 ]; then
     bar=$(build_bar "$seven_int")
     if   [ "$seven_int" -le 40 ]; then color='\033[38;2;76;175;80m'
