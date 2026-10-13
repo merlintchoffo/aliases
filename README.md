@@ -11,7 +11,7 @@ Shell aliases to launch [Claude Code](https://claude.ai/code) with a specific mo
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merlintchoffo/aliases/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/merlintchoffo/claude-setup/main/claude-aliases/install.sh | bash
 ```
 
 Detects your shell automatically (zsh / bash) and adds the aliases to your profile.
@@ -27,7 +27,7 @@ A custom status line for [Claude Code](https://claude.ai/code) showing folder, g
 **Requirements:** `bash`, `python3`, `curl` (standard on macOS/Linux)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merlintchoffo/claude-setup/claude-statusline/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/merlintchoffo/claude-setup/main/claude-statusline/install.sh | bash
 ```
 
 That's it. Restart Claude Code.
