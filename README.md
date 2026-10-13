@@ -11,7 +11,7 @@ Shell aliases to launch [Claude Code](https://claude.ai/code) with a specific mo
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/merlintchoffo/claude-aliases/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/merlintchoffo/aliases/main/install.sh | bash
 ```
 
 Detects your shell automatically (zsh / bash) and adds the aliases to your profile.
